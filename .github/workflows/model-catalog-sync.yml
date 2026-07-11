@@ -77,7 +77,8 @@ jobs:
 
       - name: Upload sync report
         if: always()
-        uses: actions/upload-artifact@v4
+        # v7 tag resolves to 043fb46d1a93c77aae656e7c1c64a875d1fc6a0a.
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: model-catalog-sync-report
           path: .tmp/model-sync-report.json

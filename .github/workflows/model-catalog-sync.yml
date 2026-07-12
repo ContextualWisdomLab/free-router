@@ -7,13 +7,15 @@ on:
     - cron: "47 4 * * 1"
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   sync:
     name: Sync model catalogs
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     concurrency:
       group: model-catalog-sync
       cancel-in-progress: false

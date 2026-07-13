@@ -6,9 +6,9 @@ Security fixes are made on the latest `1.x` release line and the current default
 branch. Older pre-1.0 releases are not maintained.
 
 | Version | Supported |
-| --- | --- |
-| 1.x | Yes |
-| < 1.0 | No |
+| ------- | --------- |
+| 1.x     | Yes       |
+| < 1.0   | No        |
 
 ## Reporting a Vulnerability
 

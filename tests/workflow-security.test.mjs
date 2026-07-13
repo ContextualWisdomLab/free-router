@@ -4,7 +4,7 @@ import { test } from "node:test";
 
 
 function readRepositoryFile(path) {
-  return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+  return readFileSync(new URL(`../${path}`, import.meta.url), "utf8").replace(/\r\n/g, "\n");
 }
 
 

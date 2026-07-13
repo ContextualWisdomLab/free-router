@@ -1,6 +1,10 @@
 import { copyFile, mkdir } from "node:fs/promises";
 
-const files = ["model-rankings.json", "model-support.json"];
+const distDataFiles = ["model-rankings.json", "model-support.json"];
 
 await mkdir("dist", { recursive: true });
-await Promise.all(files.map((file) => copyFile(`data/${file}`, `dist/${file}`)));
+await Promise.all(
+  distDataFiles.map((dataFileName) =>
+    copyFile(`data/${dataFileName}`, `dist/${dataFileName}`),
+  ),
+);

@@ -43,19 +43,49 @@ test("workflow write permissions are limited to the jobs that need them", () => 
 });
 
 
-test("release workflow treats tag names as data behind protected release gates", () => {
+test("release workflow is dispatched from trusted default-branch control", () => {
   const release = readRepositoryFile(".github/workflows/release.yml");
+
+  assert.doesNotMatch(release, /\n\s+push:\n/);
+  assert.match(release, /\n  workflow_dispatch:\n/);
+  assert.match(release, /\n      release_tag:\n/);
 
   for (const block of runBlocks(release)) {
     assert.doesNotMatch(block, /\$\{\{\s*github\.ref_name\s*\}\}/);
   }
 
-  assert.match(release, /REF_PROTECTED: \$\{\{ github\.ref_protected \}\}/);
-  assert.match(release, /Release tags must be protected by repository rulesets/);
+  assert.match(jobBlock(release, "validate-release"), /refs\/heads\/\$DEFAULT_BRANCH/);
+  assert.match(jobBlock(release, "validate-release"), /Release workflow must be dispatched from the protected default branch/);
+  assert.match(jobBlock(release, "validate-release"), /git merge-base --is-ancestor "\$tag_commit" "origin\/\$DEFAULT_BRANCH"/);
+  assert.match(release, /persist-credentials: false/);
   assert.match(jobBlock(release, "publish-cli"), /environment:\n      name: npm-release/);
   assert.match(jobBlock(release, "release-site"), /environment:\n      name: site-release/);
   assert.match(release, /\bRELEASE_TAG\b/);
-  assert.doesNotMatch(release, /gh release create "\$\{\{\s*github\.ref_name\s*\}\}"/);
+  assert.doesNotMatch(release, /\$\{\{\s*github\.ref_name\s*\}\}/);
+  assert.match(release, /--verify-tag/);
+});
+
+
+test("release credentials are not exposed to checked-out tag code", () => {
+  const release = readRepositoryFile(".github/workflows/release.yml");
+
+  for (const jobName of ["build-cli", "build-site"]) {
+    const job = jobBlock(release, jobName);
+    assert.match(job, /^    permissions:\n      contents: read$/m);
+    assert.match(job, /uses: actions\/checkout@/);
+    assert.match(job, /persist-credentials: false/);
+    assert.doesNotMatch(job, /contents: write/);
+    assert.doesNotMatch(job, /NPM_TOKEN/);
+    assert.doesNotMatch(job, /GH_TOKEN/);
+  }
+
+  for (const jobName of ["publish-cli", "release-site"]) {
+    const job = jobBlock(release, jobName);
+    assert.match(job, /^    permissions:\n      contents: write$/m);
+    assert.doesNotMatch(job, /uses: actions\/checkout@/);
+  }
+
+  assert.match(jobBlock(release, "publish-cli"), /npm publish cli-package\/\*\.tgz --ignore-scripts/);
 });
 
 

@@ -13,11 +13,27 @@ permissions:
 jobs:
   publish-cli:
     name: Publish CLI (npm)
-    if: startsWith(github.ref_name, 'cli-v') || (startsWith(github.ref_name, 'v') && !startsWith(github.ref_name, 'site-v'))
+    if: github.ref_type == 'tag' && (startsWith(github.ref_name, 'cli-v') || (startsWith(github.ref_name, 'v') && !startsWith(github.ref_name, 'site-v')))
     runs-on: ubuntu-latest
+    environment:
+      name: npm-release
+    env:
+      RELEASE_TAG: ${{ github.ref_name }}
+      REF_PROTECTED: ${{ github.ref_protected }}
     permissions:
       contents: write
     steps:
+      - name: Validate protected release tag
+        run: |
+          if [ "$REF_PROTECTED" != "true" ]; then
+            echo "::error::Release tags must be protected by repository rulesets before release credentials are exposed."
+            exit 1
+          fi
+          if [[ ! "$RELEASE_TAG" =~ ^(cli-v|v)[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Release tag must be vX.Y.Z or cli-vX.Y.Z."
+            exit 1
+          fi
+
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
@@ -36,8 +52,8 @@ jobs:
         run: |
           PKG_VERSION_LEGACY="v$(node -p "require('./package.json').version")"
           PKG_VERSION_TARGETED="cli-v$(node -p "require('./package.json').version")"
-          if [ "${{ github.ref_name }}" != "$PKG_VERSION_LEGACY" ] && [ "${{ github.ref_name }}" != "$PKG_VERSION_TARGETED" ]; then
-            echo "Tag ${{ github.ref_name }} does not match package.json version ($PKG_VERSION_LEGACY or $PKG_VERSION_TARGETED)"
+          if [ "$RELEASE_TAG" != "$PKG_VERSION_LEGACY" ] && [ "$RELEASE_TAG" != "$PKG_VERSION_TARGETED" ]; then
+            echo "Tag $RELEASE_TAG does not match package.json version ($PKG_VERSION_LEGACY or $PKG_VERSION_TARGETED)"
             exit 1
           fi
 
@@ -60,19 +76,35 @@ jobs:
 
       - name: Create GitHub release
         run: |
-          gh release create "${{ github.ref_name }}" \
-            --title "${{ github.ref_name }}" \
+          gh release create "$RELEASE_TAG" \
+            --title "$RELEASE_TAG" \
             --generate-notes
         env:
           GH_TOKEN: ${{ github.token }}
 
   release-site:
     name: Release site artifact
-    if: startsWith(github.ref_name, 'site-v')
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'site-v')
     runs-on: ubuntu-latest
+    environment:
+      name: site-release
+    env:
+      RELEASE_TAG: ${{ github.ref_name }}
+      REF_PROTECTED: ${{ github.ref_protected }}
     permissions:
       contents: write
     steps:
+      - name: Validate protected release tag
+        run: |
+          if [ "$REF_PROTECTED" != "true" ]; then
+            echo "::error::Release tags must be protected by repository rulesets before release credentials are exposed."
+            exit 1
+          fi
+          if [[ ! "$RELEASE_TAG" =~ ^site-v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Release tag must be site-vX.Y.Z."
+            exit 1
+          fi
+
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
@@ -89,8 +121,8 @@ jobs:
       - name: Verify tag matches site/package.json version
         run: |
           SITE_VERSION="site-v$(node -p "require('./site/package.json').version")"
-          if [ "$SITE_VERSION" != "${{ github.ref_name }}" ]; then
-            echo "Tag ${{ github.ref_name }} does not match site/package.json version $SITE_VERSION"
+          if [ "$SITE_VERSION" != "$RELEASE_TAG" ]; then
+            echo "Tag $RELEASE_TAG does not match site/package.json version $SITE_VERSION"
             exit 1
           fi
 
@@ -105,8 +137,8 @@ jobs:
 
       - name: Create GitHub release
         run: |
-          gh release create "${{ github.ref_name }}" site-dist.tgz \
-            --title "${{ github.ref_name }}" \
+          gh release create "$RELEASE_TAG" site-dist.tgz \
+            --title "$RELEASE_TAG" \
             --generate-notes
         env:
           GH_TOKEN: ${{ github.token }}

@@ -447,6 +447,13 @@ test("model sorting supports every exposed column and deterministic fallback", (
     ], "priority").map((m) => m.id),
     ["unknown-a", "unknown-b"],
   );
+  assert.deepEqual(
+    sortModels([
+      model({ id: "", tier: "Z", providerKey: "", displayName: "", pings: [] }),
+      model({ id: "", tier: "Z", providerKey: "", displayName: "", pings: [] }),
+    ], "priority").map((m) => m.id),
+    ["", ""],
+  );
 });
 
 test("verdicts cover status and latency boundaries", () => {

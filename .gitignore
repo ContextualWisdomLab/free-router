@@ -1,6 +1,7 @@
 # Cache artifacts
 cache/
 .cache/
+.codegraph/
 .astro/
 dist/
 *.tsbuildinfo

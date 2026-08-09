@@ -14,7 +14,7 @@ function runViteBuild() {
   const result = spawnSync(viteCommand.command, viteCommand.args, {
     cwd: siteRoot,
     stdio: 'inherit',
-    shell: viteCommand.shell,
+    shell: false,
   });
 
   if (result.status !== 0) {

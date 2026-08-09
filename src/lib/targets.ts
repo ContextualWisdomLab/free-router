@@ -1,5 +1,5 @@
 // src/lib/targets.ts — write config to OpenCode, OpenClaw, and Hermes Agent
-import { execSync, spawnSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import {
   readFileSync,
   writeFileSync,
@@ -105,13 +105,12 @@ function resolvePersistedApiKey(
 const binaryCache = new Map<string, boolean>();
 function hasBinary(bin: string) {
   if (binaryCache.has(bin)) return binaryCache.get(bin);
-  let found: boolean;
-  try {
-    execSync(IS_WIN ? `where ${bin}` : `which ${bin}`, { stdio: "ignore" });
-    found = true;
-  } catch {
-    found = false;
-  }
+  const locator = IS_WIN ? "where.exe" : "which";
+  const probe = spawnSync(locator, [bin], {
+    stdio: "ignore",
+    shell: false,
+  });
+  const found = probe.status === 0 && !probe.error;
   binaryCache.set(bin, found);
   return found;
 }
@@ -146,11 +145,31 @@ export function detectAvailableInstallers() {
   return installers;
 }
 
+function resolveOpenCodeInstallerProcess(command: string) {
+  switch (command) {
+    case "npm install -g opencode":
+      return {
+        executable: IS_WIN ? "npm.cmd" : "npm",
+        args: ["install", "-g", "opencode"],
+      };
+    case "brew install opencode":
+      return { executable: "brew", args: ["install", "opencode"] };
+    case "go install github.com/opencode-ai/opencode@latest":
+      return {
+        executable: IS_WIN ? "go.exe" : "go",
+        args: ["install", "github.com/opencode-ai/opencode@latest"],
+      };
+    default:
+      throw new Error(`Unsupported OpenCode installer command: ${command}`);
+  }
+}
+
 export function installOpenCode(installer: { command: string }) {
   try {
-    const result = spawnSync(installer.command, {
+    const processSpec = resolveOpenCodeInstallerProcess(installer.command);
+    const result = spawnSync(processSpec.executable, processSpec.args, {
       stdio: "inherit",
-      shell: true,
+      shell: false,
       timeout: 120_000,
     });
     if (result.status === 0) return { ok: true };
@@ -171,6 +190,14 @@ function envLineValue(value: string) {
   return JSON.stringify(value);
 }
 
+function envAssignmentKey(line: string) {
+  const trimmed = line.trimStart();
+  if (!trimmed || trimmed.startsWith("#")) return null;
+  const equalsIndex = trimmed.indexOf("=");
+  if (equalsIndex < 0) return null;
+  return trimmed.slice(0, equalsIndex).trimEnd();
+}
+
 function setEnvFileValue(path: string, key: string, value: string) {
   const dir = dirname(path);
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
@@ -178,8 +205,7 @@ function setEnvFileValue(path: string, key: string, value: string) {
   const nextLine = `${key}=${envLineValue(value)}`;
   let replaced = false;
   const nextLines = lines.map((line) => {
-    if (line.trimStart().startsWith("#")) return line;
-    if (!line.match(new RegExp(`^\\s*${key}\\s*=`))) return line;
+    if (envAssignmentKey(line) !== key) return line;
     replaced = true;
     return nextLine;
   });
@@ -437,11 +463,18 @@ function yamlString(value: string) {
   return JSON.stringify(value);
 }
 
+function isTopLevelYamlKeyLine(line: string, key: string) {
+  const prefix = `${key}:`;
+  if (!line.startsWith(prefix)) return false;
+  const suffix = line.slice(prefix.length).trim();
+  return suffix === "" || suffix.startsWith("#");
+}
+
 function replaceTopLevelYamlBlock(source: string, key: string, block: string) {
   const lines = source.replace(/\r\n/g, "\n").split("\n");
   let start = -1;
   for (let i = 0; i < lines.length; i++) {
-    if (new RegExp(`^${key}:\\s*(?:#.*)?$`).test(lines[i])) {
+    if (isTopLevelYamlKeyLine(lines[i], key)) {
       start = i;
       break;
     }

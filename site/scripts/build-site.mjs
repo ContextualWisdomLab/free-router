@@ -4,15 +4,17 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 import { generateSite } from './generate-site.mjs';
+import { viteCommandForPlatform } from './process-command.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const siteRoot = path.resolve(__dirname, '..');
 
 function runViteBuild() {
-  const result = spawnSync('npx', ['vite', 'build'], {
+  const viteCommand = viteCommandForPlatform();
+  const result = spawnSync(viteCommand.command, viteCommand.args, {
     cwd: siteRoot,
     stdio: 'inherit',
-    shell: process.platform === 'win32',
+    shell: viteCommand.shell,
   });
 
   if (result.status !== 0) {

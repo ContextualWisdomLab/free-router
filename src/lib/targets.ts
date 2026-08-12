@@ -160,7 +160,7 @@ function resolveOpenCodeInstallerProcess(command: string) {
         args: ["install", "github.com/opencode-ai/opencode@latest"],
       };
     default:
-      throw new Error(`Unsupported OpenCode installer command: ${command}`);
+      throw new Error(`Unsupported installer command for OpenCode: ${command}`);
   }
 }
 

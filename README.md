@@ -266,3 +266,7 @@ Stored at `~/.free-router.json` (permissions `0600`).
 ## License
 
 Apache License 2.0. See [LICENSE](./LICENSE).
+
+## Related: contextual-orchestrator gateway
+
+See [docs/contextual-orchestrator.md](./docs/contextual-orchestrator.md) for pairing free-router discoveries with the org LLM gateway.

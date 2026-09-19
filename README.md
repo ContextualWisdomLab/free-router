@@ -14,7 +14,7 @@ For the proposed `contextual-orchestrator` boundary, see [Pairing free-router wi
 
 ## Distribution status
 
-`@bytonylee/free-router` is the upstream npm distribution named by `package.json`. Its npm availability and `1.2.1` metadata are not evidence of a ContextualWisdomLab release. This fork currently has no GitHub Release.
+@bytonylee/free-router is the upstream npm distribution named by `package.json`. Its npm availability and `1.2.1` metadata are not evidence of a ContextualWisdomLab release. This fork currently has no GitHub Release.
 
 The repository source carries an Apache-2.0 grant in [LICENSE](./LICENSE). Any ContextualWisdomLab release still requires artifact-bound third-party license review, NOTICE where required, an SBOM, and provenance; this README does not infer those rights or claim that acceptance is complete.
 

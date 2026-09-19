@@ -3,11 +3,17 @@
 ![Version](https://img.shields.io/badge/version-1.2.1-333333?style=flat-square)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
 [![npm downloads](https://img.shields.io/npm/dm/%40bytonylee%2Ffree-router)](https://www.npmjs.com/package/@bytonylee/free-router)
-[![CI](https://github.com/bytonylee/free-router/actions/workflows/ci.yml/badge.svg)](https://github.com/bytonylee/free-router/actions/workflows/ci.yml)
+[![CI](https://github.com/ContextualWisdomLab/free-router/actions/workflows/ci.yml/badge.svg)](https://github.com/ContextualWisdomLab/free-router/actions/workflows/ci.yml)
 
 무료 AI 모델 라우터 CLI - OpenCode / OpenClaw용 무료 모델을 탐색, 핑 테스트, 설정합니다.
 
 ![free-router 터미널 데모](./public/demo.gif)
+
+## 배포 상태
+
+`@bytonylee/free-router`는 `package.json`이 가리키는 upstream npm 배포본입니다. npm 배포 및 `1.2.1` metadata는 ContextualWisdomLab release의 증거가 아닙니다. 이 fork에는 현재 GitHub Release가 없습니다.
+
+저장소 source에는 [LICENSE](./LICENSE)의 Apache-2.0 grant가 있습니다. ContextualWisdomLab release에는 artifact와 결속된 third-party license 검토, 필요한 NOTICE, SBOM, provenance가 별도로 필요합니다. 이 README는 권리를 추정하거나 acceptance 완료를 주장하지 않습니다.
 
 ## 설치
 

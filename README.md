@@ -3,7 +3,7 @@
 ![Version](https://img.shields.io/badge/version-1.2.1-333333?style=flat-square)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
 [![npm downloads](https://img.shields.io/npm/dm/%40bytonylee%2Ffree-router)](https://www.npmjs.com/package/@bytonylee/free-router)
-[![CI](https://github.com/bytonylee/free-router/actions/workflows/ci.yml/badge.svg)](https://github.com/bytonylee/free-router/actions/workflows/ci.yml)
+[![CI](https://github.com/ContextualWisdomLab/free-router/actions/workflows/ci.yml/badge.svg)](https://github.com/ContextualWisdomLab/free-router/actions/workflows/ci.yml)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ContextualWisdomLab/free-router)
 
 Free model router CLI - discover, ping, and configure free AI models for OpenCode / OpenClaw.
@@ -11,6 +11,12 @@ Free model router CLI - discover, ping, and configure free AI models for OpenCod
 For the proposed `contextual-orchestrator` boundary, see [Pairing free-router with contextual-orchestrator](./docs/contextual-orchestrator.md).
 
 ![free-router terminal demo](./public/demo.gif)
+
+## Distribution status
+
+`@bytonylee/free-router` is the upstream npm distribution named by `package.json`. Its npm availability and `1.2.1` metadata are not evidence of a ContextualWisdomLab release. This fork currently has no GitHub Release.
+
+The repository source carries an Apache-2.0 grant in [LICENSE](./LICENSE). Any ContextualWisdomLab release still requires artifact-bound third-party license review, NOTICE where required, an SBOM, and provenance; this README does not infer those rights or claim that acceptance is complete.
 
 ## Install
 

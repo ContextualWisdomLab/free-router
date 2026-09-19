@@ -28,6 +28,8 @@ Application / GitHub Actions -> contextual-orchestrator released contract -> ver
 
 ## Architecture document map
 
+This evidence inventory covers PRD, TRD, ADR, UML, and ERD without treating absent artifacts as completed work.
+
 | Artifact | Current evidence | Gap / Action |
 | --- | --- | --- |
 | PRD | Not present on the protected parent | Define only when product scope exceeds the README contract |

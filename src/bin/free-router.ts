@@ -1152,7 +1152,7 @@ async function applySelectionToTarget(targetId: TargetId, launch: boolean) {
     cleanup();
     const proc = spawnSync("opencode", [], {
       stdio: "inherit",
-      shell: true,
+      shell: false,
       env: launchEnv,
     });
     process.exit(Number.isInteger(proc.status) ? proc.status : 1);

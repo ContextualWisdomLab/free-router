@@ -4,8 +4,11 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
 [![npm downloads](https://img.shields.io/npm/dm/%40bytonylee%2Ffree-router)](https://www.npmjs.com/package/@bytonylee/free-router)
 [![CI](https://github.com/bytonylee/free-router/actions/workflows/ci.yml/badge.svg)](https://github.com/bytonylee/free-router/actions/workflows/ci.yml)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ContextualWisdomLab/free-router)
 
 Free model router CLI - discover, ping, and configure free AI models for OpenCode / OpenClaw.
+
+For the proposed `contextual-orchestrator` boundary, see [Pairing free-router with contextual-orchestrator](./docs/contextual-orchestrator.md).
 
 ![free-router terminal demo](./public/demo.gif)
 
@@ -266,7 +269,3 @@ Stored at `~/.free-router.json` (permissions `0600`).
 ## License
 
 Apache License 2.0. See [LICENSE](./LICENSE).
-
-## Related: contextual-orchestrator gateway
-
-See [docs/contextual-orchestrator.md](./docs/contextual-orchestrator.md) for pairing free-router discoveries with the org LLM gateway.

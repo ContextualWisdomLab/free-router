@@ -303,7 +303,7 @@ function scoreTierFromIntelligence(score: number | null): string {
 function parsePercentToNumber(input: unknown): number | null {
   if (typeof input === "number" && Number.isFinite(input)) return input;
   if (typeof input === "string") {
-    const value = Number.parseFloat(input.replace("%", "").trim());
+    const value = Number.parseFloat(input.replaceAll("%", "").trim());
     return Number.isFinite(value) ? value : null;
   }
   return null;

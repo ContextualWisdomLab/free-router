@@ -1150,9 +1150,9 @@ async function applySelectionToTarget(targetId: TargetId, launch: boolean) {
     }
     const launchEnv = buildOpenCodeLaunchEnv(targetPk, targetApiKey);
     cleanup();
-    const proc = spawnSync("opencode", [], {
+    const openCodeExecutable = process.platform === "win32" ? "opencode.cmd" : "opencode";
+    const proc = spawnSync(openCodeExecutable, [], {
       stdio: "inherit",
-      shell: true,
       env: launchEnv,
     });
     process.exit(Number.isInteger(proc.status) ? proc.status : 1);

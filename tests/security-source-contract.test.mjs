@@ -28,6 +28,13 @@ test("configuration matching and percent parsing avoid dynamic patterns", () => 
 test("the generated site does not execute externally hosted stylesheets", () => {
   for (const path of ["site/index.template.html", "site/index.html"]) {
     const html = readRepositoryFile(path);
-    assert.doesNotMatch(html, /<link[\s\S]*?href=["']https:\/\//);
+    const externalStylesheets = [...html.matchAll(/<link\b[^>]*>/g)]
+      .map(([tag]) => tag)
+      .filter(
+        (tag) =>
+          /\brel=["']stylesheet["']/.test(tag) &&
+          /\bhref=["']https:\/\//.test(tag),
+      );
+    assert.deepEqual(externalStylesheets, [], path);
   }
 });

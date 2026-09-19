@@ -1,5 +1,5 @@
 // src/lib/targets.ts — write config to OpenCode, OpenClaw, and Hermes Agent
-import { execSync, spawnSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import {
   readFileSync,
   writeFileSync,
@@ -105,13 +105,8 @@ function resolvePersistedApiKey(
 const binaryCache = new Map<string, boolean>();
 function hasBinary(bin: string) {
   if (binaryCache.has(bin)) return binaryCache.get(bin);
-  let found: boolean;
-  try {
-    execSync(IS_WIN ? `where ${bin}` : `which ${bin}`, { stdio: "ignore" });
-    found = true;
-  } catch {
-    found = false;
-  }
+  const locator = IS_WIN ? "where.exe" : "which";
+  const found = spawnSync(locator, [bin], { stdio: "ignore" }).status === 0;
   binaryCache.set(bin, found);
   return found;
 }
@@ -129,12 +124,16 @@ export function detectAvailableInstallers() {
       id: "npm",
       label: "npm",
       command: "npm install -g opencode",
+      executable: IS_WIN ? "npm.cmd" : "npm",
+      args: ["install", "-g", "opencode"],
     });
   if (platform() === "darwin" && hasBinary("brew")) {
     installers.push({
       id: "brew",
       label: "Homebrew",
       command: "brew install opencode",
+      executable: "brew",
+      args: ["install", "opencode"],
     });
   }
   if (hasBinary("go"))
@@ -142,15 +141,20 @@ export function detectAvailableInstallers() {
       id: "go",
       label: "Go",
       command: "go install github.com/opencode-ai/opencode@latest",
+      executable: "go",
+      args: ["install", "github.com/opencode-ai/opencode@latest"],
     });
   return installers;
 }
 
-export function installOpenCode(installer: { command: string }) {
+export function installOpenCode(installer: {
+  command: string;
+  executable: string;
+  args: string[];
+}) {
   try {
-    const result = spawnSync(installer.command, {
+    const result = spawnSync(installer.executable, installer.args, {
       stdio: "inherit",
-      shell: true,
       timeout: 120_000,
     });
     if (result.status === 0) return { ok: true };
@@ -179,7 +183,9 @@ function setEnvFileValue(path: string, key: string, value: string) {
   let replaced = false;
   const nextLines = lines.map((line) => {
     if (line.trimStart().startsWith("#")) return line;
-    if (!line.match(new RegExp(`^\\s*${key}\\s*=`))) return line;
+    const separatorIndex = line.indexOf("=");
+    const lineKey = separatorIndex >= 0 ? line.slice(0, separatorIndex).trim() : "";
+    if (lineKey !== key) return line;
     replaced = true;
     return nextLine;
   });
@@ -441,7 +447,13 @@ function replaceTopLevelYamlBlock(source: string, key: string, block: string) {
   const lines = source.replace(/\r\n/g, "\n").split("\n");
   let start = -1;
   for (let i = 0; i < lines.length; i++) {
-    if (new RegExp(`^${key}:\\s*(?:#.*)?$`).test(lines[i])) {
+    const separatorIndex = lines[i].indexOf(":");
+    const candidateValue = lines[i].slice(separatorIndex + 1).trim();
+    if (
+      separatorIndex === key.length &&
+      lines[i].slice(0, separatorIndex) === key &&
+      (candidateValue === "" || candidateValue.startsWith("#"))
+    ) {
       start = i;
       break;
     }

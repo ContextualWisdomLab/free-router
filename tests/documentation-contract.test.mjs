@@ -33,3 +33,15 @@ test("public READMEs distinguish upstream package provenance from this fork", ()
   assert.doesNotMatch(english, /github\.com\/bytonylee\/free-router\/actions\/workflows\/ci\.yml/);
   assert.doesNotMatch(korean, /github\.com\/bytonylee\/free-router\/actions\/workflows\/ci\.yml/);
 });
+
+test("gap baseline records product boundary, evidence, and unresolved release obligations", () => {
+  const baseline = readRepositoryFile("docs/product-technical-gap-baseline.md");
+
+  assert.match(baseline, /Status: Proposed/);
+  assert.match(baseline, /@bytonylee\/free-router/);
+  assert.match(baseline, /no GitHub Release/i);
+  assert.match(baseline, /free-router.*optional operator-side assessment/i);
+  assert.match(baseline, /contextual-orchestrator.*production discovery, capability verification, routing, and fallback authority/i);
+  assert.match(baseline, /NOTICE.*SBOM.*provenance/i);
+  assert.match(baseline, /PRD.*TRD.*ADR.*UML.*ERD/);
+});

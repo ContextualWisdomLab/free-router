@@ -9,10 +9,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const siteRoot = path.resolve(__dirname, '..');
 
 function runViteBuild() {
-  const result = spawnSync('npx', ['vite', 'build'], {
+  const npxExecutable = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+  const result = spawnSync(npxExecutable, ['vite', 'build'], {
     cwd: siteRoot,
     stdio: 'inherit',
-    shell: process.platform === 'win32',
   });
 
   if (result.status !== 0) {
